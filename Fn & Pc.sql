@@ -352,9 +352,8 @@ GO
 ---------------------
 EXECUTE sp_addmessage @msgnum = 50016,
 	@severity = 15,
-	@msgtext = ' Fournisseur inexistant',
+	@msgtext = ' Fournisseur %d inexistant',
 	@lang = 'us_english'
-	--EXECUTE sp_addmessage 50016, 15, ' Fournisseur N° %1 inexistant'
 GO
 
 EXECUTE sp_dropmessage 50016,
@@ -364,7 +363,8 @@ GO
 RAISERROR (
 		50016,
 		15,
-		1
+		1,
+		7000
 		)
 GO
 
@@ -389,7 +389,8 @@ BEGIN
 		RAISERROR (
 				50016,
 				15,
-				1
+				1,
+				@vfourn
 				)
 		WITH LOG
 
@@ -412,23 +413,4 @@ BEGIN
 END
 GO
 
-DECLARE @Res VARCHAR(20)
-DECLARE @fourni INT
-DECLARE @annee INT
-
-SET @fourni = 7000
-SET @annee = 2018
-
-EXEC prc_CA_Fournisseur2 @fourni,
-	@annee,
-	@Res OUTPUT
-
-SELECT 'Le CA du Fournisseur ',
-	@fourni,
-	' pour l''année ',
-	@annee,
-	' est de ',
-	@Res
-GO
-
--- Connexion > Gestoin > Journaux SQL Server > Actuel
+-- Connexion > Gestion > Journaux SQL Server > Actuel
