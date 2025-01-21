@@ -164,6 +164,12 @@ GO
 ---------------------
 -- 2.3.1
 ---------------------
+DROP FUNCTION [dbo].[fn_Compte]
+GO
+
+DROP TABLE [dbo].[FOURNISSEUR_IND]
+GO
+
 CREATE TABLE FOURNISSEUR_IND (
 	NUMFOU INT NOT NULL,
 	NOMFOU VARCHAR(35) NULL,
@@ -215,9 +221,6 @@ VALUES (
 	)
 GO
 
-DROP FUNCTION [dbo].[fn_Compte]
-GO
-
 CREATE FUNCTION [dbo].[fn_Compte] ()
 RETURNS INT
 	WITH SCHEMABINDING
@@ -234,12 +237,12 @@ BEGIN
 END
 GO
 
-DROP TABLE [dbo].[FOURNISSEUR_IND]
-GO
-
 ---------------------
 -- 3.1
 ---------------------
+DROP PROCEDURE [dbo].[prc_Lst_fournis]
+GO
+
 CREATE PROCEDURE [dbo].[prc_Lst_fournis]
 AS
 BEGIN
@@ -334,8 +337,8 @@ DECLARE @Res VARCHAR(20)
 DECLARE @fourni INT
 DECLARE @annee INT
 
-SET @fourni = 1801
-SET @annee = 2018
+SET @fourni = 1802
+SET @annee = 2017
 
 EXEC prc_CA_Fournisseur @fourni,
 	@annee,
@@ -350,20 +353,26 @@ SELECT 'Le CA du Fournisseur ',
 GO
 
 ---------------------
-EXECUTE sp_addmessage @msgnum = 50016,
-	@severity = 15,
-	@msgtext = ' Fournisseur %d inexistant',
-	@lang = 'us_english'
-GO
-
 EXECUTE sp_dropmessage 50016,
 	@lang = 'all'
 GO
 
+EXECUTE sp_addmessage @msgnum = 50016,
+	@severity = 15,
+	@msgtext = N'Supplier %d does not exist',
+	@lang = 'us_english'
+GO
+
+EXECUTE sp_addmessage @msgnum = 50016,
+	@severity = 15,
+	@msgtext = N'Fournisseur %1! inexistant',
+	@lang = 'french'
+GO
+
 RAISERROR (
 		50016,
-		15,
-		1,
+		-1,
+		-1,
 		7000
 		)
 GO
@@ -380,12 +389,14 @@ BEGIN
 
 	SET @count = (
 			SELECT COUNT(*)
-			FROM FOURNISSEUR
+			FROM [dbo].[FOURNISSEUR]
 			WHERE NUMFOU = @vfourn
 			);
 
 	IF (@count = 0)
 	BEGIN
+		PRINT @vfourn
+
 		RAISERROR (
 				50016,
 				15,
@@ -414,3 +425,21 @@ END
 GO
 
 -- Connexion > Gestion > Journaux SQL Server > Actuel
+DECLARE @Res VARCHAR(20)
+DECLARE @fourni INT
+DECLARE @annee INT
+
+SET @fourni = 1802
+SET @annee = 2017
+
+EXEC prc_CA_Fournisseur2 @fourni,
+	@annee,
+	@Res OUTPUT
+
+PRINT CONCAT('Le CA du Fournisseur ',
+	@fourni,
+	' pour l''année ',
+	@annee,
+	' est de ',
+	@Res)
+GO
