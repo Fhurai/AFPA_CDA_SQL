@@ -169,6 +169,10 @@ BEGIN
 		INTO @newSatisf,
 			@oldSatisf
 	END
+
+	CLOSE fournisseurs
+
+	DEALLOCATE fournisseurs
 END
 
 
@@ -220,6 +224,7 @@ BEGIN
 		SELECT CODART, STKPHY, STKALE
 		FROM inserted
 		OPEN curseur
+
 		-- Chargement de la première ligne
 		DECLARE @produit VARCHAR(4)
 		DECLARE @quantite INT
@@ -227,6 +232,7 @@ BEGIN
 		FETCH NEXT
 		FROM curseur
 		INTO @produit, @quantite, @stockAlerte
+
 		-- Parcours de inserted
 		WHILE @@FETCH_STATUS = 0
 		BEGIN
